@@ -3,7 +3,8 @@ from fontTools.ttLib import TTFont
 
 SPANISH = "áéíóúüñÁÉÍÓÚÜÑ¿¡"
 TYPOGRAPHY = "«»‹›–—…‘’“”‚„€°·•±×÷ªº\u00a0"
-REQUIRED = [chr(c) for c in range(0x20, 0x7F)] + list(SPANISH) + list(TYPOGRAPHY)
+BOXES = "─│┌┐└┘├┤┬┴┼╴╵╶╷━┃┏┓┗┛┣┫┳┻╋═║╔╗╚╝╠╣╦╩╬╭╮╯╰█▀▄▌▐░▒▓\ue0b0\ue0b1\ue0b2\ue0b3"
+REQUIRED = [chr(c) for c in range(0x20, 0x7F)] + list(SPANISH) + list(TYPOGRAPHY) + list(BOXES)
 
 LIGA_TESTS = {
     "->": ["LIG", "hyphen_greater.liga"],

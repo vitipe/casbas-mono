@@ -88,14 +88,15 @@ def build_ufo(m, glyphs):
         glyph.width = gd.advance
         if gd.unicode is not None:
             glyph.unicodes = [gd.unicode]
+        skew = 0 if gd.upright else m.skew
         if gd.draw:
-            draw_contours(glyph, gd.draw(m), m.skew)
+            draw_contours(glyph, gd.draw(m), skew)
         for base, dx, dy in gd.components:
             glyph.components.append(
                 ufoLib2.objects.Component(base, transformation=(1, 0, 0, 1, round(dx + m.skew * dy), dy)))
         if gd.anchors:
             for aname, x, y in gd.anchors(m):
-                x = x + m.skew * (y - params.SLANT_ORIGIN_Y)
+                x = x + skew * (y - params.SLANT_ORIGIN_Y)
                 glyph.appendAnchor({"name": aname, "x": round(x), "y": round(y)})
 
     ufo.features.text = calt_feature(glyphs) + "\n" + alternates_fea(glyphs)

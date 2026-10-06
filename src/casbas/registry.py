@@ -13,16 +13,18 @@ class GlyphDef:
     components: list = field(default_factory=list)  # [(base, dx, dy)]
     anchors: Optional[Callable] = None           # anchors(g) -> [(nombre, x, y)]
     advance: int = ADV
+    upright: bool = False                        # no se inclina en la oblicua (cajas, bloques)
 
 
 GLYPHS: dict[str, GlyphDef] = {}
 
 
-def glyph(name, char=None, advance=ADV, anchors=None):
+def glyph(name, char=None, advance=ADV, anchors=None, upright=False):
     """Decorador: registra una función de dibujo como glifo."""
     def deco(fn):
         code = ord(char) if isinstance(char, str) else char
-        GLYPHS[name] = GlyphDef(name, code, draw=fn, anchors=anchors, advance=advance)
+        GLYPHS[name] = GlyphDef(name, code, draw=fn, anchors=anchors, advance=advance,
+                                upright=upright)
         return fn
     return deco
 
@@ -35,5 +37,5 @@ def composite(name, char, *components, anchors=None):
 def load_all():
     # importar los módulos registra los glifos (el orden define el glyph order)
     from .glyphs import (lowercase, uppercase, digits, punctuation, marks,  # noqa: F401
-                         typography, ligatures, alternates)
+                         typography, ligatures, alternates, boxes)
     return GLYPHS
