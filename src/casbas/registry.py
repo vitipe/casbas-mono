@@ -35,5 +35,5 @@ def composite(name, char, *components, anchors=None):
 def load_all():
     # importar los módulos registra los glifos (el orden define el glyph order)
     from .glyphs import (lowercase, uppercase, digits, punctuation, marks,  # noqa: F401
-                         typography, ligatures)
+                         typography, ligatures, alternates)
     return GLYPHS

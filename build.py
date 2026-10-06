@@ -18,6 +18,7 @@ from fontTools.designspaceLib import (AxisDescriptor, DesignSpaceDocument,  # no
 from fontTools.ttLib import TTFont  # noqa: E402
 
 from casbas import params  # noqa: E402
+from casbas.glyphs.alternates import alternates_fea  # noqa: E402
 from casbas.ligatures_fea import calt_feature  # noqa: E402
 from casbas.registry import load_all  # noqa: E402
 
@@ -97,7 +98,7 @@ def build_ufo(m, glyphs):
                 x = x + m.skew * (y - params.SLANT_ORIGIN_Y)
                 glyph.appendAnchor({"name": aname, "x": round(x), "y": round(y)})
 
-    ufo.features.text = calt_feature(glyphs)
+    ufo.features.text = calt_feature(glyphs) + "\n" + alternates_fea(glyphs)
     return ufo
 
 

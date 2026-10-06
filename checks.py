@@ -63,6 +63,19 @@ def run_checks(path, glyphs):
         if names != ["hyphen", "greater"]:
             problems.append(f"calt desactivado sigue ligando: {names}")
 
+    feature_tests = [
+        ("aá g", {"ss01": True}, ["a.ss01", "aacute.ss01", "space", "g.ss01"]),
+        ("0", {"zero": True}, ["zero.zero"]),
+        ("<=", {"ss02": True}, ["LIG", "less_equal.arrow"]),
+        ("<=", {}, ["LIG", "less_equal.liga"]),
+    ]
+    for text, feats, expected in feature_tests:
+        if not all(n in glyphs for n in expected):
+            continue
+        names, _ = shape(path, text, feats)
+        if names != expected:
+            problems.append(f"feature {feats} en {text!r}: {names} (esperado {expected})")
+
     found = len([c for c in REQUIRED if ord(c) in cmap])
     print(f"checks: {len(font.getGlyphOrder())} glifos, {found}/{len(REQUIRED)} caracteres requeridos")
     for p in problems:
