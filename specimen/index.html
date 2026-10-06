@@ -30,6 +30,9 @@
   --slnt: 0;
   --size: 18px;
   --calt: 1;
+  --ss01: 0;
+  --ss02: 0;
+  --zero: 0;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -55,7 +58,7 @@ body {
 .mono {
   font-family: "Casbas Mono", ui-monospace, monospace;
   font-variation-settings: "wght" var(--wght), "slnt" var(--slnt);
-  font-feature-settings: "calt" var(--calt);
+  font-feature-settings: "calt" var(--calt), "ss01" var(--ss01), "ss02" var(--ss02), "zero" var(--zero);
 }
 .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
 
@@ -110,6 +113,24 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: 
 .lig .on { font-size: 40px; }
 .lig .off { font-size: 16px; color: var(--muted); font-feature-settings: "calt" 0; }
 
+.alts { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.alt { padding: 16px 18px; }
+.alt .g { font-size: 56px; line-height: 1.15; display: flex; gap: 22px; align-items: baseline; }
+.alt .g span:last-child { color: var(--accent); }
+.alt .l { font-size: 12px; color: var(--muted); }
+.alt code { font: 12px ui-monospace, monospace; color: var(--ink); background: var(--bg); padding: 1px 6px; border-radius: 4px; }
+
+.prose { padding: 22px 24px; font-size: calc(var(--size) * 1.15); line-height: 1.6; }
+.prose p { margin: 0 0 0.8em; } .prose p:last-child { margin: 0; }
+
+.term { background: #0f1115; color: #d8dbe2; border-radius: 12px; overflow-x: auto; }
+.term pre { margin: 0; padding: 18px 20px; font-size: var(--size); line-height: normal; }
+.term .pl1 { background: #2f5bea; color: #fff; } .term .pl1e { color: #2f5bea; background: #3a3f4b; }
+.term .pl2 { background: #3a3f4b; color: #fff; } .term .pl2e { color: #3a3f4b; }
+.term .ok { color: #8fd694; } .term .dim { color: #7b8090; }
+
+.howto pre { margin: 0; padding: 16px 18px; font: 13px/1.6 ui-monospace, monospace; overflow-x: auto; }
+
 .weights .row { display: grid; grid-template-columns: 120px 1fr; gap: 16px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); }
 .weights .row span:first-child { color: var(--muted); font-size: 13px; }
 .weights .row span:last-child { font-size: 26px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -140,12 +161,13 @@ footer { padding: 48px 0 64px; color: var(--muted); font-size: 13px; }
   <h1 class="mono">Casbas Mono</h1>
   <p>Una monoespaciada geométrica de curvas circulares, pensada para escribir código y con carácter para titulares. Generada por código: cada glifo es una función de su grosor.</p>
   <div class="meta">
-    <span><b>131</b> glifos</span>
+    <span><b>212</b> glifos</span>
     <span><b>wght</b> 100–800</span>
     <span><b>slnt</b> 0 a −10°</span>
-    <span><b>ASCII</b> + español</span>
+    <span><b>ASCII</b> + español + cajas</span>
     <span><b>13</b> ligaduras</span>
-    <span>v1.0</span>
+    <span><b>16</b> estáticas sin solapes</span>
+    <span>v1.1</span>
   </div>
 </header>
 
@@ -155,6 +177,9 @@ footer { padding: 48px 0 64px; color: var(--muted); font-size: 13px; }
     <label class="ctl">Inclinación <input id="slnt" type="range" min="-10" max="0" value="0" step="0.5"> <output for="slnt">0°</output></label>
     <label class="ctl">Tamaño <input id="size" type="range" min="11" max="32" value="18"> <output for="size">18px</output></label>
     <button class="toggle" id="calt" aria-pressed="true">Ligaduras</button>
+    <button class="toggle feat" data-feat="ss01" aria-pressed="false">ss01 · a g</button>
+    <button class="toggle feat" data-feat="zero" aria-pressed="false">zero · 0̸</button>
+    <button class="toggle feat" data-feat="ss02" aria-pressed="false">ss02 · ⇐</button>
     <button class="toggle" id="theme" aria-pressed="false">Tema</button>
   </div>
 </div>
@@ -236,6 +261,28 @@ footer { padding: 48px 0 64px; color: var(--muted); font-size: 13px; }
     <div class="ligs" id="ligs"></div>
   </section>
 
+  <section>
+    <h2>Alternativas <span style="text-transform:none;letter-spacing:0;font-weight:400">· por defecto / activada</span></h2>
+    <div class="alts">
+      <div class="card alt"><div class="g mono"><span>ag</span><span style="font-feature-settings:'ss01' 1">ag</span></div><div class="l">a y g de dos pisos · <code>ss01</code></div></div>
+      <div class="card alt"><div class="g mono"><span>0</span><span style="font-feature-settings:'zero' 1">0</span></div><div class="l">cero con barra · <code>zero</code></div></div>
+      <div class="card alt"><div class="g mono"><span>&lt;=</span><span style="font-feature-settings:'calt' 1,'ss02' 1">&lt;=</span></div><div class="l"><code>&lt;=</code> como flecha · <code>ss02</code></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Texto en español</h2>
+    <div class="card prose mono">
+      <p>«¿Has visto el informe?», preguntó Iñaki. —Sí… pero el 2.º apartado no cuadra: dice 1.250 € y 38 °C.</p>
+      <p>Las comillas “inglesas” y ‘simples’ quedan para el segundo nivel; el guion corto une rangos (1990–2025) y la raya — larga — abre incisos.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>En la terminal</h2>
+    <div class="term"><pre class="mono" id="term"></pre></div>
+  </section>
+
   <section class="weights">
     <h2>Pesos</h2>
     <div id="weights"></div>
@@ -249,6 +296,18 @@ footer { padding: 48px 0 64px; color: var(--muted); font-size: 13px; }
   <section>
     <h2>Juego de caracteres</h2>
     <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="howto">
+    <h2>Usarla en VS Code</h2>
+    <div class="card"><pre>// settings.json — variable (macOS, Windows, navegador)
+"editor.fontFamily": "Casbas Mono",
+"editor.fontLigatures": "'calt', 'ss01', 'zero'",   // quita las que no quieras
+"editor.fontVariations": "'wght' 420",
+
+// En Linux (FreeType) instala las estáticas de dist/static/ en lugar de la variable:
+// no tienen solapes y se ven limpias en terminales. Mismo nombre de familia.
+"terminal.integrated.fontFamily": "Casbas Mono"</pre></div>
   </section>
 
   <section>
@@ -276,6 +335,28 @@ function bindRange(id, cssVar, fmt) {
 bindRange("wght", "--wght", (v) => v);
 bindRange("slnt", "--slnt", (v) => v + "°");
 bindRange("size", "--size", (v) => v + "px");
+
+document.querySelectorAll(".feat").forEach((b) => b.addEventListener("click", () => {
+  const on = b.getAttribute("aria-pressed") !== "true";
+  b.setAttribute("aria-pressed", on);
+  root.style.setProperty("--" + b.dataset.feat, on ? 1 : 0);
+}));
+
+// --- terminal (los separadores Powerline están en el área de uso privado)
+const PL = String.fromCharCode(0xE0B0), PLt = String.fromCharCode(0xE0B1);
+$("#term").innerHTML =
+`<span class="pl1"> victor </span><span class="pl1e">${PL}</span><span class="pl2">  main ${PLt} src </span><span class="pl2e">${PL}</span> npm test
+╭─ <span class="ok">•</span> 42 tests ───────────────────────────╮
+│ parser.test.ts   <span class="ok">████████████████</span> 100% │
+│ server.test.ts   <span class="ok">████████████</span><span class="dim">░░░░</span>  75% │
+╰────────────────────────────────────────╯
+┌──────────┬────────┬────────┐
+│ archivo  │ líneas │ estado │
+├──────────┼────────┼────────┤
+│ main.rs  │    128 │ <span class="ok">ok</span>     │
+│ lib.rs   │     64 │ <span class="ok">ok</span>     │
+└──────────┴────────┴────────┘
+<span class="dim">╔═══╗ ▀▄▀▄ ▒▒▓▓ ▌▐</span>`;
 
 $("#calt").addEventListener("click", (e) => {
   const on = e.currentTarget.getAttribute("aria-pressed") !== "true";
@@ -321,7 +402,9 @@ $("#sizes").innerHTML = [11, 12, 13, 14, 16, 20, 28, 40, 56, 72].map((s) => `<di
 // --- juego de caracteres
 let chars = "";
 for (let c = 0x21; c < 0x7f; c++) chars += String.fromCharCode(c);
-chars += "áéíóúüñÁÉÍÓÚÜÑ¿¡";
+chars += "áéíóúüñÁÉÍÓÚÜÑ¿¡«»‹›–—…‘’“”‚„€°·•±×÷ªº";
+chars += "─│┌┐└┘├┤┬┴┼━┃┏┓┗┛┣┫┳┻╋═║╔╗╚╝╠╣╦╩╬╭╮╯╰╴╵╶╷█▀▄▌▐░▒▓";
+chars += String.fromCharCode(0xE0B0, 0xE0B1, 0xE0B2, 0xE0B3);
 $("#grid").innerHTML = [...chars].map((c) => {
   const hex = c.codePointAt(0).toString(16).toUpperCase().padStart(4, "0");
   const e = c.replace(/&/g, "&amp;").replace(/</g, "&lt;");

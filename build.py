@@ -65,9 +65,11 @@ def build_ufo(m, glyphs):
     # Panose: latin text, sans normal, …, proportion 9 = monospaced
     info.openTypeOS2Panose = [2, 11, min(10, max(2, round(m.wght / 100) + 1)), 9, 2, 2, 3, 2, 2, 4]
     info.openTypeOS2Selection = [7]  # USE_TYPO_METRICS
-    info.openTypeOS2TypoAscender = 800
-    info.openTypeOS2TypoDescender = -200
-    info.openTypeOS2TypoLineGap = 250
+    # typo = hhea = win: navegadores y terminales calculan la misma celda (1.25 em),
+    # y los caracteres de caja (que van de −250 a 1000) la llenan exactamente
+    info.openTypeOS2TypoAscender = 1000
+    info.openTypeOS2TypoDescender = -250
+    info.openTypeOS2TypoLineGap = 0
     info.openTypeHheaAscender = 1000
     info.openTypeHheaDescender = -250
     info.openTypeHheaLineGap = 0
