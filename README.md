@@ -1,5 +1,7 @@
 # Casbas Mono
 
+![Casbas Mono en el editor](docs/preview.png)
+
 Monoespaciada geométrica de curvas circulares, para código y titulares. Está generada
 por código: cada glifo es una función de Python que recibe el grosor del máster y
 devuelve contornos.
@@ -9,6 +11,10 @@ devuelve contornos.
   cajas, bloques y separadores Powerline.
 - **Ligaduras (`calt`):** `-> <- => == === != !== >= <= |> :: // ||`
 - **Alternativas:** `ss01` a y g de dos pisos · `ss02` `<=` como flecha · `zero` cero con barra
+
+![Caracteres, ligaduras y alternativas](docs/detalles.png)
+
+Las imágenes son capturas de [`specimen/index.html`](specimen/index.html).
 
 ## Archivos
 
