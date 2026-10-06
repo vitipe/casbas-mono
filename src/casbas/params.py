@@ -40,6 +40,12 @@ class Master:
         return self.s * self.contrast
 
     @property
+    def trap(self) -> float:
+        """Adelgazamiento de las uniones curva–asta (fracción del asta que se recorta).
+        Crece con el peso: en Thin no hace falta, en ExtraBold evita manchas."""
+        return 0.12 + 0.43 * (self.s - 22) / 118
+
+    @property
     def dot_r(self) -> float:
         return 0.58 * self.s + 6
 

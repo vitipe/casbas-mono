@@ -1,8 +1,8 @@
 """Minúsculas a–z (+ ı sin punto)."""
 import math
 
-from ..pen import (arc, dot, ellipse_point, mirror_x, param_at, rect, ring, rotate180,
-                   slant, slant_centers, x_at)
+from ..pen import (arc, arc_oi, dot, ellipse_point, mirror_x, param_at, rect, ring,
+                   ring_oi, rotate180, slant, slant_centers, x_at)
 from ..registry import glyph
 
 
@@ -21,19 +21,35 @@ def bowl(g, left, right):
     return ring((left + right) / 2, g.X / 2, (right - left) / 2, g.X / 2 + g.O, g.s, g.h)
 
 
-def arch(g, left, right, s=None, h=None, ry=230):
-    """Hombro de n/h/m: medio anillo superior. Devuelve (contorno, y del arranque)."""
+def stem_bowl(g, left, stem_right):
+    """Panza unida a un asta por la derecha (a, d, q, g; b y p por simetría).
+    La elipse exterior termina antes del borde del asta: la unión queda más fina."""
+    cy, ry = g.X / 2, g.X / 2 + g.O
+    ol, orr = left, stem_right - g.trap * g.s
+    il, ir = left + g.s, stem_right - g.s
+    return ring_oi(((ol + orr) / 2, cy, (orr - ol) / 2, ry),
+                   ((il + ir) / 2, cy, (ir - il) / 2, ry - g.h))
+
+
+def arch(g, left, right, s=None, h=None, ry=230, a0=0):
+    """Hombro de n/h/m/r: medio anillo superior que nace del asta izquierda.
+    La elipse exterior arranca dentro del asta (trap): unión más fina, sin mancha.
+    Devuelve (contorno, y del arranque)."""
     s = s or g.s
     h = h or g.h
     top = g.X + g.O
     cy = top - ry
-    return arc((left + right) / 2, cy, (right - left) / 2, ry, s, h, 0, 2), cy
+    ol, il, ir = left + g.trap * s, left + s, right - s
+    outer = ((ol + right) / 2, cy, (right - ol) / 2, ry)
+    inner = ((il + ir) / 2, cy, (ir - il) / 2, ry - h)
+    return arc_oi(outer, inner, a0, 2), cy
 
 
-def ellipse_x(cx, rx, cy, ry, y):
-    """x del borde derecho de una elipse a la altura y (aprox. elipse verdadera)."""
-    t = max(0.0, 1 - ((y - cy) / ry) ** 2)
-    return cx + rx * math.sqrt(t)
+def ellipse_y(cx, cy, rx, ry, x):
+    """y del borde superior de una elipse en x (elipse verdadera: queda algo por debajo
+    de nuestras curvas, que son un poco más llenas)."""
+    t = max(0.0, 1 - ((x - cx) / rx) ** 2)
+    return cy + ry * math.sqrt(t)
 
 
 def i_dot(g, cx=300):
@@ -52,7 +68,7 @@ def tail(g, stem_left, rx=175, ry=165, end=3.5):
 
 @glyph("a", "a", anchors=top_x)
 def a(g):
-    return bowl(g, g.OL, g.LR) + [rect(g.LR - g.s, 0, g.LR, g.X)]
+    return stem_bowl(g, g.OL, g.LR) + [rect(g.LR - g.s, 0, g.LR, g.X)]
 
 
 @glyph("b", "b", anchors=top_asc)
@@ -68,7 +84,7 @@ def c(g):
 
 @glyph("d", "d", anchors=top_asc)
 def d(g):
-    return bowl(g, g.OL, g.LR) + [rect(g.LR - g.s, 0, g.LR, g.A)]
+    return stem_bowl(g, g.OL, g.LR) + [rect(g.LR - g.s, 0, g.LR, g.A)]
 
 
 @glyph("e", "e", anchors=top_x)
@@ -91,7 +107,7 @@ def g_(g):
     cy = g.D - g.O + ry
     cx = (g.OL + g.LR) / 2
     rx = (g.LR - g.OL) / 2
-    return bowl(g, g.OL, g.LR) + [
+    return stem_bowl(g, g.OL, g.LR) + [
         rect(g.LR - g.s, cy, g.LR, g.X),
         arc(cx, cy, rx, ry, g.s, g.h, 2.45, 4),
     ]
@@ -109,7 +125,7 @@ def p(g):
 
 @glyph("q", "q", anchors=top_x)
 def q(g):
-    return bowl(g, g.OL, g.LR) + [rect(g.LR - g.s, g.D, g.LR, g.X)]
+    return stem_bowl(g, g.OL, g.LR) + [rect(g.LR - g.s, g.D, g.LR, g.X)]
 
 
 @glyph("s", "s", anchors=top_x)
@@ -150,11 +166,18 @@ def m(g):
     hm = g.h * 0.82
     left, right = 62, 538
     mid0 = 300 - sm / 2
-    a1, cy = arch(g, left, mid0 + sm, sm, hm, ry=200)
-    a2, _ = arch(g, mid0, right, sm, hm, ry=200)
+    ry = 200
+    a1, cy = arch(g, left, mid0 + sm, sm, hm, ry=ry)
+    a2, _ = arch(g, mid0, right, sm, hm, ry=ry)
+    # el asta central sube hasta donde la cubren los dos hombros: sin la muesca en V
+    # que a tamaño pequeño se lee como un punto blanco sobre la m
+    ol1 = left + g.trap * sm
+    cx1, rx1 = (ol1 + mid0 + sm) / 2, (mid0 + sm - ol1) / 2
+    cx2, rx2 = (mid0 + g.trap * sm + right) / 2, (right - mid0 - g.trap * sm) / 2
+    mid_top = min(ellipse_y(cx1, cy, rx1, ry, mid0), ellipse_y(cx2, cy, rx2, ry, mid0 + sm)) - 6
     return [
         rect(left, 0, left + sm, g.X),
-        rect(mid0, 0, mid0 + sm, cy),
+        rect(mid0, 0, mid0 + sm, mid_top),
         rect(right - sm, 0, right, cy),
         a1, a2,
     ]
@@ -163,13 +186,8 @@ def m(g):
 @glyph("r", "r", anchors=top_x)
 def r(g):
     left = 132
-    rx = (522 - left) / 2
-    ry = 235
-    cy = g.X + g.O - ry
-    return [
-        rect(left, 0, left + g.s, g.X),
-        arc(left + rx, cy, rx, ry, g.s, g.h * 0.95, 0.5, 2),
-    ]
+    shoulder, _ = arch(g, left, 522, h=g.h * 0.95, ry=235, a0=0.5)
+    return [rect(left, 0, left + g.s, g.X), shoulder]
 
 
 @glyph("u", "u", anchors=top_x)

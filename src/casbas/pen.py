@@ -163,14 +163,27 @@ def ring(cx, cy, rx, ry, tx, ty, k=K):
     return [ellipse(cx, cy, rx, ry, k), reverse(ellipse(cx, cy, rx - tx, ry - ty, k))]
 
 
-def _cut_param(cx, cy, rx, ry, irx, iry, a, cut, k, start):
+def ring_oi(o, i, k=K):
+    """Anillo con elipses exterior/interior independientes: o, i = (cx, cy, rx, ry)."""
+    return [ellipse(*o, k), reverse(ellipse(*i, k))]
+
+
+def box(left, right, bottom, top):
+    """Elipse (cx, cy, rx, ry) inscrita en una caja."""
+    return ((left + right) / 2, (bottom + top) / 2, (right - left) / 2, (top - bottom) / 2)
+
+
+def _cut_param(cx, cy, rx, ry, icx, icy, irx, iry, a, cut, k, start):
     """Parámetro del punto interior para un remate en a.
 
     cut: None = perpendicular al trazo, 'h' = horizontal, 'v' = vertical, o un ángulo
     en grados. La búsqueda se limita al cuarto de a, así la estructura de nodos no
     cambia entre másteres."""
     if a == math.floor(a) and cut is None:
-        return a
+        # en un cuarto exacto la normal es horizontal (a par) o vertical (a impar):
+        # si las elipses comparten ese eje, el remate recto cae en el mismo parámetro
+        if (int(a) % 2 == 0 and icy == cy) or (int(a) % 2 == 1 and icx == cx):
+            return a
     px, py = ellipse_point(cx, cy, rx, ry, a, k)
     if cut is None:
         e = 1e-4
@@ -185,7 +198,7 @@ def _cut_param(cx, cy, rx, ry, irx, iry, a, cut, k, start):
         dx, dy = math.cos(math.radians(cut)), math.sin(math.radians(cut))
 
     def f(b):
-        ix, iy = ellipse_point(cx, cy, irx, iry, b, k)
+        ix, iy = ellipse_point(icx, icy, irx, iry, b, k)
         return dx * (iy - py) - dy * (ix - px)
 
     q = math.floor(a) if (start or a != math.floor(a)) else a - 1
@@ -211,21 +224,28 @@ def _cut_param(cx, cy, rx, ry, irx, iry, a, cut, k, start):
     return (u + v) / 2
 
 
-def arc(cx, cy, rx, ry, tx, ty, a0, a1, k=K, cut0=None, cut1=None):
-    """Banda de arco de a0 a a1 con grosor tx (horizontal) / ty (vertical).
-    cut0/cut1: dirección del remate en cada extremo (ver _cut_param)."""
-    irx, iry = rx - tx, ry - ty
-    b0 = _cut_param(cx, cy, rx, ry, irx, iry, a0, cut0, k, start=True)
-    b1 = _cut_param(cx, cy, rx, ry, irx, iry, a1, cut1, k, start=False)
-    outer = _segs_to_nodes(arc_segments(cx, cy, rx, ry, a0, a1, k))
-    inner = _segs_to_nodes(arc_segments(cx, cy, irx, iry, b0, b1, k))
+def arc_oi(o, i, a0, a1, k=K, cut0=None, cut1=None):
+    """Banda de arco entre la elipse exterior o y la interior i, ambas (cx, cy, rx, ry).
+    Con centros distintos el grosor varía a lo largo del arco (p. ej. más fino donde el
+    hombro de la n se une al asta). Si un extremo es un cuarto exacto y las elipses
+    comparten esa coordenada, el remate es recto (horizontal o vertical)."""
+    b0 = _cut_param(*o, *i, a0, cut0, k, start=True)
+    b1 = _cut_param(*o, *i, a1, cut1, k, start=False)
+    outer = _segs_to_nodes(arc_segments(*o, a0, a1, k))
+    inner = _segs_to_nodes(arc_segments(*i, b0, b1, k))
     assert len(outer) == len(inner), "arco incompatible: el corte cruzó un cuarto"
     return ccw(outer + inner[::-1])
 
 
+def arc(cx, cy, rx, ry, tx, ty, a0, a1, k=K, cut0=None, cut1=None):
+    """Banda de arco de a0 a a1 con grosor tx (horizontal) / ty (vertical).
+    cut0/cut1: dirección del remate en cada extremo (ver _cut_param)."""
+    return arc_oi((cx, cy, rx, ry), (cx, cy, rx - tx, ry - ty), a0, a1, k, cut0, cut1)
+
+
 def arc_end(cx, cy, rx, ry, tx, ty, a, k=K, cut=None, start=True):
     """Puntos (exterior, interior) del remate de un arco en a."""
-    b = _cut_param(cx, cy, rx, ry, rx - tx, ry - ty, a, cut, k, start)
+    b = _cut_param(cx, cy, rx, ry, cx, cy, rx - tx, ry - ty, a, cut, k, start)
     return ellipse_point(cx, cy, rx, ry, a, k), ellipse_point(cx, cy, rx - tx, ry - ty, b, k)
 
 
