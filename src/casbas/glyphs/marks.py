@@ -1,5 +1,7 @@
 """Acentos combinantes (avance 0, dibujados sobre la celda anterior) y compuestos."""
-from ..pen import dot, mirror_x, stroke
+import math
+
+from ..pen import dot, mirror_x, poly
 from ..registry import composite, glyph
 from .punctuation import tilde_shape
 
@@ -11,8 +13,14 @@ def mark_anchor(g):
 
 
 def acute_mark(g):
-    w = g.s * 0.8
-    return [stroke(MC - 62, g.X + 100, MC + 70, g.X + 252, w)]
+    """Cuña: fina abajo, ancha arriba (en bold un paralelogramo se lee como gancho)."""
+    w = g.s * 0.86 + 6
+    x0, y0, x1, y1 = MC - 66, g.X + 98, MC + 74, g.X + 262
+    L = math.hypot(x1 - x0, y1 - y0)
+    nx, ny = -(y1 - y0) / L, (x1 - x0) / L
+    b, t = w * 0.28, w * 0.55
+    return [poly((x0 + nx * b, y0 + ny * b), (x0 - nx * b, y0 - ny * b),
+                 (x1 - nx * t, y1 - ny * t), (x1 + nx * t, y1 + ny * t))]
 
 
 def grave_mark(g):

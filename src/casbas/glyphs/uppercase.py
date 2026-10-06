@@ -1,5 +1,5 @@
 """Mayúsculas A–Z."""
-from ..pen import arc, param_at, rect, ring, slant, slant_centers, x_at
+from ..pen import arc, bar, param_at, rect, ring, slant, slant_centers, x_at
 from ..registry import glyph
 from .lowercase import s_shape
 
@@ -230,7 +230,7 @@ def K(g):
     ly = g.C * 0.52
     return [
         stem(g, g.CL),
-        slant(g.CL + g.s * 0.72, jy, g.CR + 6, g.C, w, "c", "r"),
+        bar((a0, jy), (a1, g.C), w, ("v2", g.CL + g.s * 0.08, g.CL + g.s * 0.92), ("h", g.C)),
         slant(g.CR + 14, 0, x_at(a0, jy, a1, g.C, ly), ly, w, "r", "c"),
     ]
 

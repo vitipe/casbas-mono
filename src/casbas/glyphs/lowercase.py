@@ -1,7 +1,7 @@
 """Minúsculas a–z (+ ı sin punto)."""
 import math
 
-from ..pen import (arc, arc_oi, dot, ellipse_point, mirror_x, param_at, rect, ring,
+from ..pen import (arc, arc_oi, bar, dot, ellipse_point, mirror_x, param_at, rect, ring,
                    ring_oi, rotate180, slant, slant_centers, x_at)
 from ..registry import glyph
 
@@ -273,7 +273,8 @@ def k(g):
     ly = g.X * 0.5
     return [
         rect(g.LL, 0, g.LL + g.s, g.A),
-        slant(g.LL + g.s * 0.72, jy, g.LR + 4, g.X, w, "c", "r"),
+        # brazo: remate vertical escondido dentro del asta (sin escalón a la derecha)
+        bar((a0, jy), (a1, g.X), w, ("v2", g.LL + g.s * 0.08, g.LL + g.s * 0.92), ("h", g.X)),
         slant(g.LR + 12, 0, x_at(a0, jy, a1, g.X, ly), ly, w, "r", "c"),
     ]
 

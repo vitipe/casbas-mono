@@ -1,5 +1,5 @@
 """Puntuación y símbolos ASCII + ¿ ¡."""
-from ..pen import (arc, chevron, dot, ellipse, ellipse_point, mirror_x, mirror_y, rect,
+from ..pen import (arc, chevron, dot, ellipse, ellipse_point, mirror_x, mirror_y, poly, rect,
                    reverse, ring, rotate180, slant, stroke, translate)
 from ..registry import glyph
 from .lowercase import s_shape
@@ -151,15 +151,19 @@ def greater(g):
 
 @glyph("asciitilde", "~")
 def asciitilde(g):
-    return tilde_shape(g, 300, MATH_Y, half=218, amp=36 + 0.45 * g.s, w=g.s * 0.8 + 4)
+    # en pesos gruesos, menos grosor vertical en las crestas para que no se cierren
+    ty = 0.85 - 0.2 * (g.s - 22) / 118
+    bold = (g.s - 22) / 118
+    return tilde_shape(g, 300, MATH_Y, half=218 + 30 * bold, amp=36 + 0.45 * g.s,
+                       w=g.s * 0.8 + 4, ty=ty, txf=1 - 0.2 * bold)
 
 
-def tilde_shape(g, cx, cy, half, amp, w, ty=0.85, a0=0.25, a1=1.78):
+def tilde_shape(g, cx, cy, half, amp, w, ty=0.85, a0=0.25, a1=1.78, txf=1.0):
     """Tilde en onda: arco ∩ de a0 a a1 + su copia girada 180° alrededor de (cx, cy).
     El punto medio del corte en a0 se coloca en (cx, cy), así ambas mitades comparten
     corte y tangente en la inflexión. half = semiancho exterior, amp = radio vertical."""
     from ..pen import arc_end
-    tx, tyy = w, w * ty
+    tx, tyy = w * txf, w * ty
     ry = amp / 0.64 + tyy / 2      # cresta ≈ 0.64·ry_medio sobre la inflexión
     rx = (half - w / 2) / 1.88 + w / 2
     (ox, oy), (ix, iy) = arc_end(0, 0, rx, ry, tx, tyy, a0)
@@ -255,7 +259,9 @@ def braceleft(g):
         rect(sx, mid + h / 2 + r2 - h, sx + g.s, PAR_TOP - r1),
         arc(sx + g.s - r2, mid + h / 2 + r2 - h, r2, r2, g.s, h, 3, 4),
     ]
-    tip = rect(138, mid - h / 2, sx + g.s - r2, mid + h / 2)
+    # punta afilada hacia la izquierda: no parece un guion pegado a la llave
+    jx = sx + g.s - r2 + 8
+    tip = poly((138, mid - h * 0.32), (jx, mid - h / 2), (jx, mid + h / 2), (138, mid + h * 0.32))
     return upper + mirror_y(upper, mid) + [tip]
 
 
@@ -307,8 +313,8 @@ def ampersand(g):
     tcx, tcy = 250, g.C + g.O - try_
     brx, bry = 208, 228
     bcx, bcy = 262, bry - g.O
-    return [
-        arc(tcx, tcy, trx, try_, w, h, -0.6, 3.25),
+    # lazo superior cerrado: la diagonal nace de su parte baja sin dejar rendijas
+    return ring(tcx, tcy, trx, try_, w, h) + [
         arc(bcx, bcy, brx, bry, w, h, 1.2, 4.2),
         slant(g.CR + 18, 0, tcx - 25, tcy - try_ + h * 0.5, w * 1.02, "r", "c"),
     ]

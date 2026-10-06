@@ -290,6 +290,34 @@ def slant(x0, y0, x1, y1, w, a0="c", a1="c"):
     return poly((c0 - hw, y0), (c0 + hw, y0), (c1 + hw, y1), (c1 - hw, y1))
 
 
+def bar(p0, p1, w, cut0, cut1):
+    """Trazo recto de grosor w a lo largo del eje p0→p1, con remates arbitrarios.
+    cut = ('h', y) corta en horizontal a la altura y; ('v', x) en vertical en x;
+    ('v2', x_izq, x_der) une el borde izquierdo en x_izq con el derecho en x_der
+    (útil para esconder el remate dentro de un asta)."""
+    dx, dy = p1[0] - p0[0], p1[1] - p0[1]
+    L = math.hypot(dx, dy)
+    nx, ny = -dy / L * w / 2, dx / L * w / 2
+
+    def meet(px, py, cut, side):
+        kind, *v = cut
+        if kind == "h":
+            t = (v[0] - py) / dy
+        elif kind == "v":
+            t = (v[0] - px) / dx
+        else:  # v2: v[0] para el borde izquierdo (+n si el eje sube), v[1] para el derecho
+            left_is_plus = nx < 0
+            x = v[0] if (side > 0) == left_is_plus else v[1]
+            t = (x - px) / dx
+        return px + dx * t, py + dy * t
+
+    a0 = meet(p0[0] + nx, p0[1] + ny, cut0, +1)
+    b0 = meet(p0[0] - nx, p0[1] - ny, cut0, -1)
+    a1 = meet(p0[0] + nx, p0[1] + ny, cut1, +1)
+    b1 = meet(p0[0] - nx, p0[1] - ny, cut1, -1)
+    return poly(a0, b0, b1, a1)
+
+
 def x_at(c0, y0, c1, y1, y):
     """x del eje de un trazo (c0,y0)-(c1,y1) a la altura y."""
     return c0 + (c1 - c0) * (y - y0) / (y1 - y0)
