@@ -4,7 +4,7 @@ import math
 
 FAMILY = "Casbas Mono"
 PS_FAMILY = "CasbasMono"
-VERSION = (1, 0)
+VERSION = (1, 1)
 
 UPM = 1000
 ADV = 600          # avance fijo (monospace)
