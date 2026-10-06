@@ -84,3 +84,39 @@ def run_checks(path, glyphs):
     if not problems:
         print("  ✓ todo correcto")
     return not problems
+
+
+def overlap_area(glyphset, name):
+    """Área contada dos veces por solapes: suma con signo de los contornos − área de la unión."""
+    import pathops
+    from fontTools.pens.areaPen import AreaPen
+    pen = AreaPen(glyphset)
+    glyphset[name].draw(pen)
+    path = pathops.Path()
+    glyphset[name].draw(path.getPen(glyphSet=glyphset))
+    path.simplify(fix_winding=True)
+    union = AreaPen(glyphset)
+    path.draw(union)
+    return abs(abs(pen.value) - abs(union.value))
+
+
+def run_static_checks(paths):
+    """Estáticas: monospace, sin contornos solapados."""
+    problems = []
+    for p in paths:
+        font = TTFont(p)
+        if font["post"].isFixedPitch != 1:
+            problems.append(f"{p.name}: isFixedPitch != 1")
+        advances = {font["hmtx"][n][0] for n in font.getGlyphOrder()} - {0}
+        if advances != {600}:
+            problems.append(f"{p.name}: avances {advances}")
+        gs = font.getGlyphSet()
+        overlapped = [n for n in font.getGlyphOrder() if overlap_area(gs, n) > 1.0]
+        if overlapped:
+            problems.append(f"{p.name}: {len(overlapped)} glifos con solapes ({', '.join(overlapped[:6])}…)")
+    print(f"checks estáticas: {len(paths)} archivos")
+    for pr in problems:
+        print("  ✗", pr)
+    if not problems:
+        print("  ✓ sin solapes, monospace")
+    return not problems

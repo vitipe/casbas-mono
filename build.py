@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Construye Casbas Mono: params → UFOs → designspace → fontmake → woff2 → checks/pruebas.
 
-Uso:  .venv/bin/python build.py [--no-proofs]
+Uso:  .venv/bin/python build.py [--no-proofs] [--no-static]
 """
 import argparse
 import shutil
@@ -161,11 +161,38 @@ def postprocess(path):
     return woff2
 
 
+def build_statics(ds_path):
+    """Instancias estáticas sin solapes (fontmake -i las elimina con skia-pathops).
+    Para terminales y programas cuyo rasterizador (FreeType) dibuja mal los solapes."""
+    out = DIST / "static"
+    if out.exists():
+        shutil.rmtree(out)
+    subprocess.run(
+        [str(ROOT / ".venv/bin/fontmake"), "-m", str(ds_path), "-o", "ttf", "-i",
+         "--output-dir", str(out), "--overlaps-backend", "pathops",
+         "--no-production-names", "--verbose", "WARNING"],
+        check=True,
+    )
+    paths = []
+    for p in sorted(out.glob("*.ttf")):
+        font = TTFont(p)
+        font["post"].isFixedPitch = 1
+        font["OS/2"].panose.bProportion = 9
+        dest = out / p.name.replace(" ", "")   # "Casbas Mono-Thin Oblique" → "CasbasMono-ThinOblique"
+        font.save(dest)
+        if dest != p:
+            p.unlink()
+        paths.append(dest)
+    print(f"→ {len(paths)} estáticas en {out.relative_to(ROOT)}/")
+    return paths
+
+
 # --------------------------------------------------------------------------- main
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-proofs", action="store_true")
+    ap.add_argument("--no-static", action="store_true", help="no generar las instancias estáticas")
     args = ap.parse_args()
 
     glyphs = load_all()
@@ -193,8 +220,12 @@ def main():
     woff2 = postprocess(vf)
     print(f"→ {vf.relative_to(ROOT)}\n→ {woff2.relative_to(ROOT)}")
 
-    from checks import run_checks
+    from checks import run_checks, run_static_checks
     ok = run_checks(vf, glyphs)
+
+    if not args.no_static:
+        statics = build_statics(ds_path)
+        ok = run_static_checks(statics) and ok
 
     if not args.no_proofs:
         from proofs import render_proofs
