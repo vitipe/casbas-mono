@@ -14,7 +14,7 @@ devuelve contornos.
 
 ![Caracteres, ligaduras y alternativas](docs/detalles.png)
 
-Las imágenes son capturas de [`specimen/index.html`](specimen/index.html).
+**[Probala online →](https://vitipe.github.io/casbas-mono/specimen/)** (muestrario interactivo: peso, inclinación, ligaduras y alternativas).
 
 ## Archivos
 
