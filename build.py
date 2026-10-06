@@ -76,7 +76,7 @@ def build_ufo(m, glyphs):
     info.openTypeOS2WinAscent = 1000
     info.openTypeOS2WinDescent = 250
     info.openTypeNameDesigner = "Victor Casbas"
-    info.copyright = "Copyright 2026 Victor Casbas"
+    info.copyright = "Copyright 2026 Victor Peñas"
     info.openTypeNameLicense = "This Font Software is licensed under the SIL Open Font License, Version 1.1."
     info.openTypeNameLicenseURL = "https://openfontlicense.org"
 
