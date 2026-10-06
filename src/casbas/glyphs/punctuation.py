@@ -25,12 +25,12 @@ def period_shape(g, cx=300, y=0):
     return [dot(cx, y + r, r)]
 
 
-def comma_shape(g, cx=300, y=0):
-    r = g.dot_r
+def comma_shape(g, cx=300, y=0, r=None, tail=150):
+    r = r or g.dot_r
     # gota: punto + cola inclinada hacia abajo-izquierda tangente al punto
     return [
         dot(cx, y + r, r),
-        stroke(cx + r * 0.38, y + r * 0.9, cx - r * 0.55 - 30, y - 150, r * 1.05),
+        stroke(cx + r * 0.38, y + r * 0.9, cx - r * 0.55 - tail / 5, y - tail, r * 1.05),
     ]
 
 

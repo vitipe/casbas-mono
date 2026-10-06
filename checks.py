@@ -2,7 +2,8 @@
 from fontTools.ttLib import TTFont
 
 SPANISH = "áéíóúüñÁÉÍÓÚÜÑ¿¡"
-REQUIRED = [chr(c) for c in range(0x20, 0x7F)] + list(SPANISH)
+TYPOGRAPHY = "«»‹›–—…‘’“”‚„€°·•±×÷ªº\u00a0"
+REQUIRED = [chr(c) for c in range(0x20, 0x7F)] + list(SPANISH) + list(TYPOGRAPHY)
 
 LIGA_TESTS = {
     "->": ["LIG", "hyphen_greater.liga"],
