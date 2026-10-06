@@ -1,0 +1,6 @@
+fontmake>=3.9
+ufoLib2
+fonttools[woff,unicode]
+skia-pathops
+uharfbuzz
+Pillow

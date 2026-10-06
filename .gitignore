@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+master/
+proofs/
+.DS_Store

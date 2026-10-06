@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Casbas Mono</title>
+<style>
+@font-face {
+  font-family: "Casbas Mono";
+  src: url("../dist/CasbasMono%5Bslnt,wght%5D.woff2") format("woff2-variations"),
+       url("../dist/CasbasMono%5Bslnt,wght%5D.woff2") format("woff2");
+  font-weight: 100 800;
+  font-style: oblique 0deg 10deg;
+}
+
+:root {
+  --bg: #f6f5f1;
+  --surface: #ffffff;
+  --ink: #16161a;
+  --muted: #6b6a66;
+  --line: #e2e0d9;
+  --accent: #2f5bea;
+  --code-bg: #fbfaf7;
+  --kw: #a23ec7;
+  --str: #2b8a3e;
+  --num: #c2570c;
+  --com: #8a8780;
+  --fn: #2f5bea;
+  --wght: 400;
+  --slnt: 0;
+  --size: 18px;
+  --calt: 1;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121214; --surface: #1a1a1d; --ink: #ecebe6; --muted: #9a9890; --line: #2c2c30;
+    --accent: #7c9cff; --code-bg: #161618; --kw: #d49bff; --str: #8fd694; --num: #ffb070;
+    --com: #6f6d66; --fn: #8fb0ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121214; --surface: #1a1a1d; --ink: #ecebe6; --muted: #9a9890; --line: #2c2c30;
+  --accent: #7c9cff; --code-bg: #161618; --kw: #d49bff; --str: #8fd694; --num: #ffb070;
+  --com: #6f6d66; --fn: #8fb0ff;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.mono {
+  font-family: "Casbas Mono", ui-monospace, monospace;
+  font-variation-settings: "wght" var(--wght), "slnt" var(--slnt);
+  font-feature-settings: "calt" var(--calt);
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+header { padding: 56px 0 28px; }
+header h1 {
+  margin: 0;
+  font-size: clamp(56px, 13vw, 148px);
+  line-height: 0.95;
+  letter-spacing: 0;
+  font-weight: normal;
+}
+header p { margin: 18px 0 0; color: var(--muted); max-width: 60ch; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 18px; color: var(--muted); font-size: 13px; }
+.meta b { color: var(--ink); font-weight: 600; }
+
+.controls {
+  position: sticky; top: 0; z-index: 5;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.controls .wrap { display: flex; flex-wrap: wrap; gap: 10px 26px; align-items: center; padding-top: 12px; padding-bottom: 12px; }
+.ctl { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.ctl output { min-width: 3.2em; color: var(--ink); font-variant-numeric: tabular-nums; }
+input[type=range] { width: 130px; accent-color: var(--accent); }
+button.toggle {
+  font: inherit; font-size: 13px; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; cursor: pointer;
+}
+button.toggle[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+
+section { padding: 40px 0 8px; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; margin: 0 0 16px; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+
+.editor { background: var(--code-bg); overflow-x: auto; }
+.editor pre { margin: 0; padding: 20px 22px; font-size: var(--size); line-height: 1.55; tab-size: 4; }
+.editor .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); padding: 8px 10px 0; }
+.editor .tabs button { font: 13px system-ui, sans-serif; color: var(--muted); background: none; border: 0; padding: 6px 12px 8px; cursor: pointer; border-bottom: 2px solid transparent; }
+.editor .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.kw { color: var(--kw); } .str { color: var(--str); } .num { color: var(--num); }
+.com { color: var(--com); font-variation-settings: "wght" var(--wght), "slnt" -10; } .fn { color: var(--fn); }
+
+.pairs { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.pair { padding: 16px 14px 12px; text-align: center; }
+.pair .g { font-size: 52px; line-height: 1.1; white-space: pre; }
+.pair .l { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+.ligs { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.lig { padding: 14px; display: flex; justify-content: space-between; align-items: center; }
+.lig .on { font-size: 40px; }
+.lig .off { font-size: 16px; color: var(--muted); font-feature-settings: "calt" 0; }
+
+.weights .row { display: grid; grid-template-columns: 120px 1fr; gap: 16px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.weights .row span:first-child { color: var(--muted); font-size: 13px; }
+.weights .row span:last-child { font-size: 26px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.sizes div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 4px 0; }
+.sizes small { display: inline-block; width: 44px; color: var(--muted); font: 12px system-ui, sans-serif; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.cell { background: var(--surface); aspect-ratio: 1 / 1.15; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+.cell .c { font-size: 34px; line-height: 1; }
+.cell .u { position: absolute; bottom: 4px; font-size: 9px; color: var(--muted); font-family: system-ui, sans-serif; }
+.cell:hover { outline: 2px solid var(--accent); z-index: 1; }
+
+.tester { padding: 18px 20px; font-size: calc(var(--size) * 1.6); min-height: 120px; outline: none; line-height: 1.4; }
+.tester:focus { border-color: var(--accent); }
+
+footer { padding: 48px 0 64px; color: var(--muted); font-size: 13px; }
+
+@media (max-width: 560px) {
+  .weights .row { grid-template-columns: 1fr; gap: 2px; }
+  input[type=range] { width: 100px; }
+}
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <h1 class="mono">Casbas Mono</h1>
+  <p>Una monoespaciada geométrica de curvas circulares, pensada para escribir código y con carácter para titulares. Generada por código: cada glifo es una función de su grosor.</p>
+  <div class="meta">
+    <span><b>131</b> glifos</span>
+    <span><b>wght</b> 100–800</span>
+    <span><b>slnt</b> 0 a −10°</span>
+    <span><b>ASCII</b> + español</span>
+    <span><b>13</b> ligaduras</span>
+    <span>v1.0</span>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="wrap">
+    <label class="ctl">Peso <input id="wght" type="range" min="100" max="800" value="400"> <output for="wght">400</output></label>
+    <label class="ctl">Inclinación <input id="slnt" type="range" min="-10" max="0" value="0" step="0.5"> <output for="slnt">0°</output></label>
+    <label class="ctl">Tamaño <input id="size" type="range" min="11" max="32" value="18"> <output for="size">18px</output></label>
+    <button class="toggle" id="calt" aria-pressed="true">Ligaduras</button>
+    <button class="toggle" id="theme" aria-pressed="false">Tema</button>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <section>
+    <h2>En el editor</h2>
+    <div class="card editor">
+      <div class="tabs" role="tablist">
+        <button role="tab" aria-selected="true" data-tab="ts">server.ts</button>
+        <button role="tab" aria-selected="false" data-tab="py">parser.py</button>
+        <button role="tab" aria-selected="false" data-tab="rs">main.rs</button>
+      </div>
+<pre class="mono" data-pane="ts"><span class="com">// Respuesta paginada con caché</span>
+<span class="kw">import</span> { createServer } <span class="kw">from</span> <span class="str">"node:http"</span>;
+
+<span class="kw">const</span> PAGE_SIZE = <span class="num">20</span>;
+<span class="kw">const</span> cache = <span class="kw">new</span> Map&lt;<span class="kw">string</span>, Item[]&gt;();
+
+<span class="kw">export async function</span> <span class="fn">handler</span>(req: Request): Promise&lt;Response&gt; {
+  <span class="kw">const</span> page = Number(req.query?.page ?? <span class="num">0</span>);
+  <span class="kw">if</span> (page &lt; <span class="num">0</span> || !Number.isFinite(page)) <span class="kw">return</span> <span class="fn">error</span>(<span class="num">400</span>);
+  <span class="kw">const</span> key = <span class="str">`items:${page}`</span>;
+  <span class="kw">if</span> (cache.has(key) &amp;&amp; page !== <span class="num">0</span>) <span class="kw">return</span> <span class="fn">json</span>(cache.get(key));
+  <span class="kw">const</span> rows = (<span class="kw">await</span> db.items()).filter((x) =&gt; x.score &gt;= <span class="num">0.5</span>);
+  <span class="kw">return</span> <span class="fn">json</span>(rows.slice(page * PAGE_SIZE, (page + <span class="num">1</span>) * PAGE_SIZE));
+}</pre>
+<pre class="mono" data-pane="py" hidden><span class="com"># Tokenizador mínimo: 0O 1lI son distinguibles</span>
+<span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass
+
+<span class="kw">@dataclass</span>
+<span class="kw">class</span> <span class="fn">Token</span>:
+    kind: str
+    value: str | <span class="kw">None</span> = <span class="kw">None</span>
+
+<span class="kw">def</span> <span class="fn">tokenize</span>(src: str) -&gt; list[Token]:
+    out, i = [], <span class="num">0</span>
+    <span class="kw">while</span> i &lt; len(src):
+        c = src[i]
+        <span class="kw">if</span> c.isdigit():
+            j = i
+            <span class="kw">while</span> j &lt; len(src) <span class="kw">and</span> src[j].isdigit(): j += <span class="num">1</span>
+            out.append(Token(<span class="str">"num"</span>, src[i:j])); i = j
+        <span class="kw">elif</span> c <span class="kw">in</span> <span class="str">"+-*/=!&lt;&gt;"</span>:
+            out.append(Token(<span class="str">"op"</span>, c)); i += <span class="num">1</span>
+        <span class="kw">else</span>:
+            i += <span class="num">1</span>  <span class="com"># ignorar espacios: ¿y los acentos? ¡también!</span>
+    <span class="kw">return</span> out</pre>
+<pre class="mono" data-pane="rs" hidden><span class="kw">use</span> std::collections::HashMap;
+
+<span class="com">/// Cuenta palabras ignorando mayúsculas</span>
+<span class="kw">fn</span> <span class="fn">count</span>(text: &amp;<span class="kw">str</span>) -&gt; HashMap&lt;String, <span class="kw">usize</span>&gt; {
+    <span class="kw">let mut</span> map = HashMap::new();
+    <span class="kw">for</span> w <span class="kw">in</span> text.split_whitespace() {
+        *map.entry(w.to_lowercase()).or_insert(<span class="num">0</span>) += <span class="num">1</span>;
+    }
+    map
+}
+
+<span class="kw">fn</span> <span class="fn">main</span>() {
+    <span class="kw">let</span> m = <span class="fn">count</span>(<span class="str">"el ñandú y el pingüino"</span>);
+    <span class="kw">match</span> m.get(<span class="str">"el"</span>) {
+        Some(&amp;n) <span class="kw">if</span> n &gt;= <span class="num">2</span> =&gt; println!(<span class="str">"{n} veces"</span>),
+        _ =&gt; {}
+    }
+    <span class="kw">let</span> f = |x: <span class="kw">i32</span>| x &lt;= <span class="num">0x1F</span> || x != <span class="num">0</span>;
+}</pre>
+    </div>
+  </section>
+
+  <section>
+    <h2>Caracteres que no se confunden</h2>
+    <div class="pairs" id="pairs"></div>
+  </section>
+
+  <section>
+    <h2>Ligaduras <span style="text-transform:none;letter-spacing:0;font-weight:400">· feature calt, cada una ocupa sus celdas</span></h2>
+    <div class="ligs" id="ligs"></div>
+  </section>
+
+  <section class="weights">
+    <h2>Pesos</h2>
+    <div id="weights"></div>
+  </section>
+
+  <section class="sizes">
+    <h2>Tamaños</h2>
+    <div id="sizes"></div>
+  </section>
+
+  <section>
+    <h2>Juego de caracteres</h2>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section>
+    <h2>Prueba</h2>
+    <div class="card tester mono" contenteditable="true" spellcheck="false">Escribe aquí: if (a != b &amp;&amp; c >= 0) { return x -> y; }</div>
+  </section>
+</main>
+
+<footer class="wrap">Casbas Mono · SIL Open Font License 1.1 · generada con fontTools + fontmake</footer>
+
+<script>
+const root = document.documentElement;
+const $ = (s) => document.querySelector(s);
+
+function store(k, v) { try { localStorage.setItem("casbas:" + k, v); } catch (e) {} }
+function load(k) { try { return localStorage.getItem("casbas:" + k); } catch (e) { return null; } }
+
+// --- controles
+function bindRange(id, cssVar, fmt) {
+  const el = $("#" + id), out = el.parentElement.querySelector("output");
+  const apply = () => { root.style.setProperty(cssVar, cssVar === "--size" ? el.value + "px" : el.value); out.textContent = fmt(el.value); };
+  el.addEventListener("input", apply);
+  apply();
+}
+bindRange("wght", "--wght", (v) => v);
+bindRange("slnt", "--slnt", (v) => v + "°");
+bindRange("size", "--size", (v) => v + "px");
+
+$("#calt").addEventListener("click", (e) => {
+  const on = e.currentTarget.getAttribute("aria-pressed") !== "true";
+  e.currentTarget.setAttribute("aria-pressed", on);
+  root.style.setProperty("--calt", on ? 1 : 0);
+});
+
+const themeBtn = $("#theme");
+function setTheme(t) {
+  if (t) root.dataset.theme = t; else delete root.dataset.theme;
+  const dark = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  themeBtn.textContent = dark ? "Tema claro" : "Tema oscuro";
+}
+setTheme(load("theme"));
+themeBtn.addEventListener("click", () => {
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  const next = dark ? "light" : "dark";
+  setTheme(next); store("theme", next);
+});
+
+// --- pestañas del editor
+document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll(".tabs button").forEach((x) => x.setAttribute("aria-selected", x === b));
+  document.querySelectorAll("[data-pane]").forEach((p) => p.hidden = p.dataset.pane !== b.dataset.tab);
+}));
+
+// --- pares confundibles
+const pairs = [["0Oo", "cero / O / o"], ["1lI|", "uno / ele / i / barra"], ["il1!", "i / ele / uno / exclam."], [";:", "punto y coma / dos puntos"], ["'\"`", "comillas / grave"], ["rn m", "r n / m"], ["{[(", "llave / corchete / paréntesis"], ["B8", "B / ocho"], ["S5$", "S / cinco / dólar"], ["Z2", "Z / dos"], ["-_~", "guion / bajo / tilde"], ["gq9", "g / q / nueve"]];
+$("#pairs").innerHTML = pairs.map(([g, l]) => `<div class="card pair"><div class="g mono">${g.replace(/</g, "&lt;")}</div><div class="l">${l}</div></div>`).join("");
+
+// --- ligaduras
+const ligs = ["->", "<-", "=>", "==", "===", "!=", "!==", ">=", "<=", "|>", "::", "//", "||"];
+$("#ligs").innerHTML = ligs.map((s) => { const e = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); return `<div class="card lig"><span class="on mono">${e}</span><span class="off mono">${e}</span></div>`; }).join("");
+
+// --- pesos
+const names = { 100: "Thin", 200: "ExtraLight", 300: "Light", 400: "Regular", 500: "Medium", 600: "SemiBold", 700: "Bold", 800: "ExtraBold" };
+const pangram = "El veloz murciélago hindú comía feliz cardillo y kiwi.";
+$("#weights").innerHTML = Object.entries(names).map(([w, n]) => `<div class="row"><span>${n} · ${w}</span><span class="mono" style="font-variation-settings:'wght' ${w},'slnt' var(--slnt)">${pangram}</span></div>`).join("");
+
+// --- tamaños
+$("#sizes").innerHTML = [11, 12, 13, 14, 16, 20, 28, 40, 56, 72].map((s) => `<div><small>${s}px</small><span class="mono" style="font-size:${s}px">const ñandú = { x: 0x1F, y: [1, 2, 3] }; // ¿listo? ¡sí!</span></div>`).join("");
+
+// --- juego de caracteres
+let chars = "";
+for (let c = 0x21; c < 0x7f; c++) chars += String.fromCharCode(c);
+chars += "áéíóúüñÁÉÍÓÚÜÑ¿¡";
+$("#grid").innerHTML = [...chars].map((c) => {
+  const hex = c.codePointAt(0).toString(16).toUpperCase().padStart(4, "0");
+  const e = c.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  return `<div class="cell" title="U+${hex}"><span class="c mono">${e}</span><span class="u">${hex}</span></div>`;
+}).join("");
+</script>
+</body>
+</html>
